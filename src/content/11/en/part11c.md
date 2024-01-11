@@ -76,7 +76,7 @@ You'll need the token soon for your deployment workflow!
 
 Before setting up the deployment pipeline let us ensure that a manual deployment with the command <i>flyctl deploy</i> works.
 
-You most likely need to do at least three changes. Firstly, define the Node version to use in the file <i>package.json</i> to match one used in your machine. For me it is 16.19.1:
+You most likely need to do at least four changes. Firstly, define the Node version to use in the file <i>package.json</i> to match one used in your machine. For me it is 16.19.1:
 
 ```json
 {
@@ -105,6 +105,23 @@ The configuration file <i>fly.toml</i> should also be modified to include the fo
   [build.args]
     NODE_VERSION = "16.19.1"
 ```
+
+The Dockerfile configuration can be adjusted as follows:
+
+```dockerfile
+# Adjust NODE_VERSION
+ARG NODE_VERSION=16.20.2
+FROM node:${NODE_VERSION}-slim as base
+```
+
+...and change 'python-is-python3' to 'python3'
+
+```dockerfile
+# Install packages needed to build node modules
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y build-essential node-gyp pkg-config python3
+```
+
 
 Besides these, we should also move _webpack_ from _devDependencies_ to _dependencies_ since our build step requires it to be installed:
 
